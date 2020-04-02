@@ -1,5 +1,18 @@
-const usersRepo = require('./user.memory.repository');
+const users = require('./user.collection');
+const userModel = require('./user.model');
 
-const getAll = () => usersRepo.getAll();
+async function getAll() {
+  return users;
+}
 
-module.exports = { getAll };
+async function createUser(user) {
+  users.push(new userModel(user));
+}
+
+async function findUser({ login }) {
+  return users.find(item => {
+    return item.login === login;
+  });
+}
+
+module.exports = { getAll, createUser, findUser };
