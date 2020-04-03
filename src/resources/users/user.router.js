@@ -18,7 +18,7 @@ router
       if (error) {
         return next(error.details.pop().message);
       }
-      if (await usersService.findUser(validatedUser)) {
+      if (await usersService.findUserByLogin(validatedUser.login)) {
         return next(`User with login ${validatedUser.login} already exist`);
       }
       next();
@@ -31,6 +31,29 @@ router
       });
     }
   );
+
+router.param('id', async (req, res, next, id) => {
+  const foundedUser = await usersService.findUserById(id);
+  if (foundedUser) {
+    req.user = foundedUser;
+    next();
+  } else {
+    next(`User with id: ${id} doesn't exist`);
+  }
+});
+
+router
+  .route('/:id')
+  .get((req, res) => {
+    res.status(200).json(User.toResponse(req.user));
+  })
+  .delete(async (req, res) => {
+    const { id: userId } = req.user;
+    await usersService.deleteUser(req.user);
+    res.status(200).json({
+      message: `User with id: ${userId} deleted successfully`
+    });
+  });
 
 router.use((err, req, res, next) => {
   res.status(201).json({
