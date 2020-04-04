@@ -10,10 +10,12 @@ async function getAll() {
 
 /**
  * @param {object} user
- * @returns {Promise<void>}
+ * @returns {Promise<User>}
  */
 async function createUser(user) {
-  users.push(new userModel(user));
+  const newUser = new userModel(user);
+  users.push(newUser);
+  return newUser;
 }
 
 /**

@@ -8,60 +8,56 @@ router
   .get(async (req, res) => {
     const users = await usersService.getAll();
     // map user fields to exclude secret fields like "password"
-    res.json(users.map(User.toResponse));
+    res.status(200).json(users.map(User.toResponse));
   })
   .post(
     async (req, res, next) => {
-      const newUser = req.body;
-      req.newUser = newUser;
-      const { value: validatedUser, error } = userSchema.validate(newUser);
+      const newUser = (req.newUser = req.body);
+      const { error } = userSchema.validate(newUser);
       if (error) {
-        return next(error.details.pop().message);
-      }
-      if (await usersService.getUserByLogin(validatedUser.login)) {
-        return next(`User with login ${validatedUser.login} already exist`);
+        return next('Bad request');
       }
       next();
     },
     async (req, res) => {
       const { newUser } = req;
-      await usersService.createUser(newUser);
-      res.status(400).json({
-        message: `User ${newUser.login} created successfully`
-      });
+      const createdUser = await usersService.createUser(newUser);
+      res.status(200).json(User.toResponse(createdUser));
     }
   );
+
+router.use((err, req, res, next) => {
+  res.status(400).json(err);
+  next();
+});
 
 router.param('id', async (req, res, next, id) => {
   const foundedUser = await usersService.getUserById(id);
   if (foundedUser) {
-    req.user = foundedUser;
+    req.foundedUser = foundedUser;
     return next();
   }
-  return next(`User with id: ${id} doesn't exist`);
+  return next('Not found');
 });
 
 router
   .route('/:id')
   .get((req, res) => {
-    res.status(200).json(User.toResponse(req.user));
+    res.status(200).json(User.toResponse(req.foundedUser));
   })
   .put(async (req, res) => {
     const newDataForUser = req.body;
-    const user = req.user;
+    const user = req.foundedUser;
     await usersService.updateUser(user, newDataForUser);
-    res.status(200).json(`User with id: ${user.id} updated successfully`);
+    res.status(200).json('The user has been updated');
   })
   .delete(async (req, res) => {
-    const { id: userId } = req.user;
-    await usersService.deleteUser(req.user);
-    res.status(200).json(`User with id: ${userId} deleted successfully`);
+    await usersService.deleteUser(req.foundedUser);
+    res.status(204).json('The user deleted successfully');
   });
 
 router.use((err, req, res, next) => {
-  res.status(201).json({
-    error: err
-  });
+  res.status(404).json(err);
   next();
 });
 
