@@ -20,7 +20,7 @@ async function createUser(user) {
  * @param {string} login
  * @returns {Promise<Promise<*>|*>}
  */
-async function findUserByLogin(login) {
+async function getUserByLogin(login) {
   return users.find(item => {
     return item.login === login;
   });
@@ -30,8 +30,24 @@ async function findUserByLogin(login) {
  * @param {string} id
  * @returns {Promise<Promise<*>|*>}
  */
-async function findUserById(id) {
+async function getUserById(id) {
   return users.find(item => item.id === id);
+}
+
+/**
+ * @param {object} user
+ * @param {object} newData
+ * @returns {Promise<void>}
+ */
+async function updateUser(user, newData) {
+  users.map((item, index) => {
+    if (item.id === user.id) {
+      users.splice(index, 1, {
+        ...user,
+        ...newData
+      });
+    }
+  });
 }
 
 /**
@@ -49,7 +65,8 @@ async function deleteUser(user) {
 module.exports = {
   getAll,
   createUser,
-  findUserByLogin,
-  findUserById,
-  deleteUser
+  getUserByLogin,
+  getUserById,
+  deleteUser,
+  updateUser
 };

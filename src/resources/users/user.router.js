@@ -18,7 +18,7 @@ router
       if (error) {
         return next(error.details.pop().message);
       }
-      if (await usersService.findUserByLogin(validatedUser.login)) {
+      if (await usersService.getUserByLogin(validatedUser.login)) {
         return next(`User with login ${validatedUser.login} already exist`);
       }
       next();
@@ -33,13 +33,12 @@ router
   );
 
 router.param('id', async (req, res, next, id) => {
-  const foundedUser = await usersService.findUserById(id);
+  const foundedUser = await usersService.getUserById(id);
   if (foundedUser) {
     req.user = foundedUser;
-    next();
-  } else {
-    next(`User with id: ${id} doesn't exist`);
+    return next();
   }
+  return next(`User with id: ${id} doesn't exist`);
 });
 
 router
@@ -47,12 +46,16 @@ router
   .get((req, res) => {
     res.status(200).json(User.toResponse(req.user));
   })
+  .put(async (req, res) => {
+    const newDataForUser = req.body;
+    const user = req.user;
+    await usersService.updateUser(user, newDataForUser);
+    res.status(200).json(`User with id: ${user.id} updated successfully`);
+  })
   .delete(async (req, res) => {
     const { id: userId } = req.user;
     await usersService.deleteUser(req.user);
-    res.status(200).json({
-      message: `User with id: ${userId} deleted successfully`
-    });
+    res.status(200).json(`User with id: ${userId} deleted successfully`);
   });
 
 router.use((err, req, res, next) => {
