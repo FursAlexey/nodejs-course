@@ -52,7 +52,8 @@ router
     res.status(200).json('The user has been updated');
   })
   .delete(async (req, res) => {
-    await usersService.deleteUser(req.foundedUser);
+    const user = req.foundedUser;
+    await usersService.deleteUser(user);
     res.status(204).json('The user deleted successfully');
   });
 
