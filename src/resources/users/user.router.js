@@ -26,10 +26,6 @@ router
     }
   );
 
-router.use((err, req, res, next) => {
-  err();
-});
-
 router.param('id', async (req, res, next, id) => {
   const foundedUser = await userService.getUserById(id);
   if (foundedUser) {
@@ -58,6 +54,7 @@ router
 
 router.use((err, req, res, next) => {
   err();
+  next();
 });
 
 module.exports = router;
