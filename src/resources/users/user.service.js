@@ -1,5 +1,6 @@
 const users = require('./user.collection');
 const userModel = require('./user.model');
+const taskService = require('../tasks/task.service');
 
 /**
  * @returns {Promise<[]>}
@@ -9,23 +10,13 @@ async function getAll() {
 }
 
 /**
- * @param {object} user
+ * @param {object<User>} user
  * @returns {Promise<User>}
  */
 async function createUser(user) {
   const newUser = new userModel(user);
   users.push(newUser);
   return newUser;
-}
-
-/**
- * @param {string} login
- * @returns {Promise<Promise<*>|*>}
- */
-async function getUserByLogin(login) {
-  return users.find(item => {
-    return item.login === login;
-  });
 }
 
 /**
@@ -37,7 +28,7 @@ async function getUserById(id) {
 }
 
 /**
- * @param {object} user
+ * @param {object<User>} user
  * @param {object} newData
  * @returns {Promise<void>}
  */
@@ -53,10 +44,11 @@ async function updateUser(user, newData) {
 }
 
 /**
- * @param {object} user
+ * @param {object<User>} user
  * @returns {Promise<void>}
  */
 async function deleteUser(user) {
+  await taskService.unassignUserTasks(user);
   users.map((item, index) => {
     if (item.id === user.id) {
       users.splice(index, 1);
@@ -67,7 +59,6 @@ async function deleteUser(user) {
 module.exports = {
   getAll,
   createUser,
-  getUserByLogin,
   getUserById,
   deleteUser,
   updateUser

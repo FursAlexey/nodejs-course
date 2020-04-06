@@ -9,7 +9,7 @@ async function getAll() {
 }
 
 /**
- * @param {object} board
+ * @param {object<Board>} board
  * @returns {Promise<Board>}
  */
 async function createBoard(board) {
@@ -27,7 +27,7 @@ async function getBoardById(id) {
 }
 
 /**
- * @param {object} board
+ * @param {object<Board>} board
  * @param {object} newBoardData
  * @returns {Promise<void>}
  */
@@ -43,7 +43,7 @@ async function updateBoard(board, newBoardData) {
 }
 
 /**
- * @param {object} board
+ * @param {object<Board>} board
  * @returns {Promise<void>}
  */
 async function deleteBoard(board) {
