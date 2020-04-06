@@ -1,11 +1,12 @@
 const router = require('express').Router();
-const boardsService = require('./board.service');
+const boardService = require('./board.service');
 const boardSchema = require('./board.schema');
+const taskRouter = require('../tasks/task.router');
 
 router
   .route('/')
   .get(async (req, res) => {
-    const boards = await boardsService.getAll();
+    const boards = await boardService.getAll();
     res.status(200).json(boards);
   })
   .post(
@@ -19,18 +20,19 @@ router
     },
     async (req, res) => {
       const { newBoardData } = req;
-      const createdBoard = await boardsService.createBoard(newBoardData);
+      const createdBoard = await boardService.createBoard(newBoardData);
       res.status(200).json(createdBoard);
     }
   );
 
 router.param('id', async (req, res, next, id) => {
-  const foundedBoard = await boardsService.getBoardById(id);
+  const foundedBoard = await boardService.getBoardById(id);
   if (foundedBoard) {
     req.board = foundedBoard;
+    req.boardId = id;
     return next();
   }
-  next(() => res.status(404).json('Not found'));
+  return next(() => res.status(404).json('Not found'));
 });
 
 router
@@ -42,14 +44,16 @@ router
   .put(async (req, res) => {
     const newBoardData = req.body;
     const { board } = req;
-    await boardsService.updateBoard(board, newBoardData);
+    await boardService.updateBoard(board, newBoardData);
     res.status(200).json('The board updated successfully');
   })
   .delete(async (req, res) => {
     const { board } = req;
-    await boardsService.deleteBoard(board);
+    await boardService.deleteBoard(board);
     res.status(204).json('The board have been deleted');
   });
+
+router.use('/:id/tasks', taskRouter);
 
 router.use((err, req, res, next) => {
   err();
