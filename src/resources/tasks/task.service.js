@@ -19,7 +19,7 @@ async function createTask(taskData) {
  * @param {string} id
  * @returns {Promise<Promise<*>|*>}
  */
-async function findTaskById(id) {
+async function getTaskById(id) {
   return tasks.find(item => item.id === id);
 }
 
@@ -69,7 +69,7 @@ async function unassignUserTasks(user) {
 module.exports = {
   getAllBoardTask,
   createTask,
-  findTaskById,
+  getTaskById,
   updateTask,
   deleteTask,
   unassignUserTasks

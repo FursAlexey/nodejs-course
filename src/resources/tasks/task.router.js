@@ -23,7 +23,7 @@ router
   });
 
 router.param('id', async (req, res, next, id) => {
-  const foundedTask = await taskService.findTaskById(id);
+  const foundedTask = await taskService.getTaskById(id);
   if (foundedTask) {
     req.task = foundedTask;
     return next();
