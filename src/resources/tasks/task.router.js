@@ -1,12 +1,12 @@
 const router = require('express').Router();
-const taskService = require('./task.service');
+const tasksService = require('./task.service');
 const taskSchema = require('./task.schema');
 
 router
   .route('/')
   .get(async (req, res) => {
     const { boardId } = req;
-    const boardTasks = await taskService.getAllBoardTask(boardId);
+    const boardTasks = await tasksService.getAllBoardTask(boardId);
     res.status(200).json(boardTasks);
   })
   .post(async (req, res, next) => {
@@ -18,12 +18,12 @@ router
     if (error) {
       return next(() => res.status(401).json('Bad request'));
     }
-    const createdTask = await taskService.createTask(newTaskData);
+    const createdTask = await tasksService.createTask(newTaskData);
     res.status(200).json(createdTask);
   });
 
 router.param('id', async (req, res, next, id) => {
-  const foundedTask = await taskService.getTaskById(id);
+  const foundedTask = await tasksService.getTaskById(id);
   if (foundedTask) {
     req.task = foundedTask;
     return next();
@@ -44,12 +44,12 @@ router
     if (error) {
       return next(() => res.status(400).json('Bad request'));
     }
-    await taskService.updateTask(taskForUpdate, taskUpdateData);
+    await tasksService.updateTask(taskForUpdate, taskUpdateData);
     return res.status(200).json('The task updated');
   })
   .delete(async (req, res) => {
     const { task } = req;
-    await taskService.deleteTask(task);
+    await tasksService.deleteTask(task);
     res.status(200).json('The task deleted successfully');
   });
 

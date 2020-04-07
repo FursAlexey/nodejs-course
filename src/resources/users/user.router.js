@@ -1,13 +1,12 @@
 const router = require('express').Router();
 const User = require('./user.model');
-const userService = require('./user.service');
+const usersService = require('./user.service');
 const userSchema = require('./user.schema');
 
 router
   .route('/')
   .get(async (req, res) => {
-    const users = await userService.getAll();
-    // map user fields to exclude secret fields like "password"
+    const users = await usersService.getAll();
     res.status(200).json(users.map(User.toResponse));
   })
   .post(
@@ -21,13 +20,13 @@ router
     },
     async (req, res) => {
       const { newUser } = req;
-      const createdUser = await userService.createUser(newUser);
+      const createdUser = await usersService.createUser(newUser);
       res.status(200).json(User.toResponse(createdUser));
     }
   );
 
 router.param('id', async (req, res, next, id) => {
-  const foundedUser = await userService.getUserById(id);
+  const foundedUser = await usersService.getUserById(id);
   if (foundedUser) {
     req.foundedUser = foundedUser;
     return next();
@@ -41,14 +40,14 @@ router
     res.status(200).json(User.toResponse(req.foundedUser));
   })
   .put(async (req, res) => {
-    const newDataForUser = req.body;
+    const newUserData = req.body;
     const user = req.foundedUser;
-    await userService.updateUser(user, newDataForUser);
+    await usersService.updateUser(user, newUserData);
     res.status(200).json('The user has been updated');
   })
   .delete(async (req, res) => {
     const user = req.foundedUser;
-    await userService.deleteUser(user);
+    await usersService.deleteUser(user);
     res.status(204).json('The user deleted successfully');
   });
 

@@ -1,65 +1,16 @@
-const users = require('./user.collection');
-const userModel = require('./user.model');
-const taskService = require('../tasks/task.service');
+const usersRepo = require('./user.memory.repository');
 
-/**
- * @returns {Promise<[]>}
- */
-async function getAll() {
-  return users;
-}
-
-/**
- * @param {object<User>} user
- * @returns {Promise<User>}
- */
-async function createUser(user) {
-  const newUser = new userModel(user);
-  users.push(newUser);
-  return newUser;
-}
-
-/**
- * @param {string} id
- * @returns {Promise<Promise<*>|*>}
- */
-async function getUserById(id) {
-  return users.find(item => item.id === id);
-}
-
-/**
- * @param {object<User>} user
- * @param {object} newData
- * @returns {Promise<void>}
- */
-async function updateUser(user, newData) {
-  users.map((item, index) => {
-    if (item.id === user.id) {
-      users.splice(index, 1, {
-        ...user,
-        ...newData
-      });
-    }
-  });
-}
-
-/**
- * @param {object<User>} user
- * @returns {Promise<void>}
- */
-async function deleteUser(user) {
-  await taskService.unassignUserTasks(user);
-  users.map((item, index) => {
-    if (item.id === user.id) {
-      users.splice(index, 1);
-    }
-  });
-}
+const getAll = () => usersRepo.getAll();
+const createUser = user => usersRepo.createUser(user);
+const getUserById = id => usersRepo.getUserById(id);
+const updateUser = (user, updateUserData) =>
+  usersRepo.updateUser(user, updateUserData);
+const deleteUser = user => usersRepo.deleteUser(user);
 
 module.exports = {
   getAll,
   createUser,
   getUserById,
-  deleteUser,
-  updateUser
+  updateUser,
+  deleteUser
 };
