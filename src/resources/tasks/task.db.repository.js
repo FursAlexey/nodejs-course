@@ -1,26 +1,25 @@
-const taskModel = require('./task.model');
-const tasks = [];
+const Task = require('./task.model');
 
-async function getAllBoardTask(boardId) {
-  return tasks.filter(item => item.boardId === boardId);
+function getAllBoardTask(boardId) {
+  return Task.find({
+    boardId
+  });
 }
 
 /**
  * @param {object<Task>} taskData
  * @returns {Promise<Task>}
  */
-async function createTask(taskData) {
-  const newTask = new taskModel(taskData);
-  tasks.push(newTask);
-  return newTask;
+function createTask(taskData) {
+  return Task.create(taskData);
 }
 
 /**
  * @param {string} id
  * @returns {Promise<Promise<*>|*>}
  */
-async function getTaskById(id) {
-  return tasks.find(item => item.id === id);
+function getTaskById(id) {
+  return Task.findById(id);
 }
 
 /**
@@ -28,42 +27,31 @@ async function getTaskById(id) {
  * @param {object} taskUpdateData
  * @returns {Promise<void>}
  */
-async function updateTask(task, taskUpdateData) {
-  tasks.map((item, index) => {
-    if (item.id === task.id) {
-      tasks.splice(index, 1, {
-        ...task,
-        ...taskUpdateData
-      });
-    }
-  });
+function updateTask(task, taskUpdateData) {
+  Task.updateOne(task, taskUpdateData);
 }
 
 /**
  * @param {object<Task>} task
  * @returns {Promise<void>}
  */
-async function deleteTask(task) {
-  tasks.map((item, index) => {
-    if (item.id === task.id) {
-      tasks.splice(index, 1);
-    }
-  });
+function deleteTask(task) {
+  Task.findOneAndDelete(task);
 }
 
 /**
  * @param {object<User>} user
  * @returns {Promise<void>}
  */
-async function unassignUserTasks(user) {
-  tasks.map((item, index) => {
-    if (item.userId === user.id) {
-      tasks.splice(index, 1, {
-        ...item,
-        userId: null
-      });
-    }
-  });
+function unassignUserTasks(user) {
+  // tasks.map((item, index) => {
+  //   if (item.userId === user.id) {
+  //     tasks.splice(index, 1, {
+  //       ...item,
+  //       userId: null
+  //     });
+  //   }
+  // });
 }
 
 module.exports = {
