@@ -1,14 +1,17 @@
 const router = require('express').Router();
 const tasksService = require('./task.service');
 const taskSchema = require('./task.schema');
+const { tryCatch } = require('../service');
 
 router
   .route('/')
-  .get(async (req, res) => {
-    const { boardId } = req;
-    const boardTasks = await tasksService.getAllBoardTask(boardId);
-    res.status(200).json(boardTasks);
-  })
+  .get(
+    tryCatch(async (req, res) => {
+      const { boardId } = req;
+      const boardTasks = await tasksService.getAllBoardTask(boardId);
+      res.status(200).json(boardTasks);
+    })
+  )
   .post(async (req, res, next) => {
     const newTaskData = {
       ...req.body,
@@ -52,10 +55,5 @@ router
     await tasksService.deleteTask(task);
     res.status(200).json('The task deleted successfully');
   });
-
-router.use((err, req, res, next) => {
-  err();
-  next();
-});
 
 module.exports = router;
