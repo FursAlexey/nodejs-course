@@ -1,27 +1,7 @@
-const uuid = require('uuid');
-const mongoose = require('mongoose');
+const Joi = require('@hapi/joi');
 
-const userSchema = mongoose.Schema(
-  {
-    _id: {
-      type: String,
-      default: uuid
-    },
-    name: String,
-    login: String,
-    password: String
-  },
-  {
-    versionKey: false
-  }
-);
-
-userSchema.statics.toResponse = ({ _id: id, name, login }) => {
-  return {
-    id,
-    name,
-    login
-  };
-};
-
-module.exports = userSchema;
+module.exports = Joi.object({
+  name: Joi.string().required(),
+  login: Joi.string().required(),
+  password: Joi.string().required()
+});

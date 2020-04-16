@@ -1,6 +1,7 @@
 const router = require('express').Router();
 const User = require('./user.model');
 const usersService = require('./user.service');
+const userSchema = require('./user.schema');
 
 router
   .route('/')
@@ -8,11 +9,21 @@ router
     const users = await usersService.getAll();
     res.status(200).json(users.map(User.toResponse));
   })
-  .post(async (req, res) => {
-    const newUser = req.body;
-    const createdUser = await usersService.createUser(newUser);
-    res.status(200).json(User.toResponse(createdUser));
-  });
+  .post(
+    async (req, res, next) => {
+      const newUser = (req.newUser = req.body);
+      const { error } = userSchema.validate(newUser);
+      if (error) {
+        return next(() => res.status(400).json('Bad request'));
+      }
+      next();
+    },
+    async (req, res) => {
+      const { newUser } = req;
+      const createdUser = await usersService.createUser(newUser);
+      res.status(200).json(User.toResponse(createdUser));
+    }
+  );
 
 router.param('id', async (req, res, next, id) => {
   const foundedUser = await usersService.getUserById(id);
