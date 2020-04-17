@@ -1,14 +1,14 @@
 const mongoose = require('mongoose');
 const uuid = require('uuid');
 
-module.exports = mongoose.Schema(
+const boardSchema = mongoose.Schema(
   {
     _id: {
       type: String,
       default: uuid
     },
     title: String,
-    column: [
+    columns: [
       {
         _id: {
           type: String,
@@ -23,3 +23,18 @@ module.exports = mongoose.Schema(
     versionKey: false
   }
 );
+
+boardSchema.statics.toResponse = ({ _id: id, title, columns }) => {
+  const cols = columns.map(column => ({
+    id: column._id,
+    title: column.title,
+    order: column.order
+  }));
+  return {
+    id,
+    title,
+    columns: cols
+  };
+};
+
+module.exports = boardSchema;

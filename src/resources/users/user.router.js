@@ -22,8 +22,7 @@ router
 router.param(
   'id',
   tryCatch(async (req, res, next, id) => {
-    const foundedUser = await usersService.getUserById(id);
-    req.foundedUser = foundedUser;
+    req.foundedUser = await usersService.getUserById(id);
     next();
   })
 );

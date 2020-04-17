@@ -11,7 +11,7 @@ function getAll() {
  * @param {object<Board>} board
  * @returns {Promise<Board>}
  */
-function createBoard(board) {
+async function createBoard(board) {
   return Board.create(board);
 }
 
@@ -19,8 +19,8 @@ function createBoard(board) {
  * @param {string} id
  * @returns {Promise<Promise<*>|*>}
  */
-function getBoardById(id) {
-  return Board.findById(id);
+async function getBoardById(id) {
+  return await Board.findById(id);
 }
 
 /**
@@ -28,16 +28,16 @@ function getBoardById(id) {
  * @param {object} newBoardData
  * @returns {Promise<void>}
  */
-function updateBoard(board, newBoardData) {
-  return Board.updateOne(board, newBoardData);
+async function updateBoard(board, newBoardData) {
+  return Board.findOneAndUpdate({ _id: board._id }, newBoardData);
 }
 
 /**
  * @param {object<Board>} board
  * @returns {Promise<void>}
  */
-function deleteBoard(board) {
-  return Board.findOneAndDelete(board);
+async function deleteBoard(board) {
+  await Board.deleteOne(board);
 }
 
 module.exports = {

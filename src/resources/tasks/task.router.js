@@ -1,7 +1,7 @@
 const router = require('express').Router();
 const tasksService = require('./task.service');
-const taskSchema = require('./task.schema');
 const { tryCatch } = require('../service');
+const Task = require('./task.model');
 
 router
   .route('/')
@@ -9,47 +9,43 @@ router
     tryCatch(async (req, res) => {
       const { boardId } = req;
       const boardTasks = await tasksService.getAllBoardTask(boardId);
-      res.status(200).json(boardTasks);
+      res.status(200).json(boardTasks.map(task => Task.toResponse(task)));
     })
   )
-  .post(async (req, res, next) => {
+  .post(async (req, res) => {
     const newTaskData = {
       ...req.body,
       boardId: req.boardId
     };
-    const { error } = taskSchema.validate(newTaskData);
-    if (error) {
-      return next(() => res.status(401).json('Bad request'));
-    }
     const createdTask = await tasksService.createTask(newTaskData);
-    res.status(200).json(createdTask);
+    console.log(Task.toResponse(createdTask));
+    res.status(200).json(Task.toResponse(createdTask));
   });
 
-router.param('id', async (req, res, next, id) => {
-  const foundedTask = await tasksService.getTaskById(id);
-  if (foundedTask) {
-    req.task = foundedTask;
-    return next();
-  }
-  next(() => res.status(404).json('Not found'));
-});
+router.param(
+  'id',
+  tryCatch(async (req, res, next, id) => {
+    req.task = await tasksService.getTaskById(id);
+    next();
+  })
+);
 
 router
   .route('/:id')
-  .get(async (req, res) => {
-    const { task } = req;
-    res.status(200).json(task);
-  })
-  .put(async (req, res, next) => {
-    const taskUpdateData = req.body;
-    const taskForUpdate = req.task;
-    const { error } = taskSchema.validate(taskUpdateData);
-    if (error) {
-      return next(() => res.status(400).json('Bad request'));
-    }
-    await tasksService.updateTask(taskForUpdate, taskUpdateData);
-    return res.status(200).json('The task updated');
-  })
+  .get(
+    tryCatch(async (req, res) => {
+      const { task } = req;
+      res.status(200).json(Task.toResponse(task));
+    })
+  )
+  .put(
+    tryCatch(async (req, res) => {
+      const { task } = req;
+      const taskUpdateData = req.body;
+      const updatedTask = await tasksService.updateTask(task, taskUpdateData);
+      return res.status(200).json(Task.toResponse(updatedTask));
+    })
+  )
   .delete(async (req, res) => {
     const { task } = req;
     await tasksService.deleteTask(task);

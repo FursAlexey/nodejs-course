@@ -28,7 +28,7 @@ function getTaskById(id) {
  * @returns {Promise<void>}
  */
 function updateTask(task, taskUpdateData) {
-  Task.updateOne(task, taskUpdateData);
+  return Task.updateOne(task, taskUpdateData);
 }
 
 /**
@@ -36,7 +36,7 @@ function updateTask(task, taskUpdateData) {
  * @returns {Promise<void>}
  */
 function deleteTask(task) {
-  Task.findOneAndDelete(task);
+  return Task.deleteOne(task);
 }
 
 /**
@@ -44,14 +44,14 @@ function deleteTask(task) {
  * @returns {Promise<void>}
  */
 function unassignUserTasks(user) {
-  // tasks.map((item, index) => {
-  //   if (item.userId === user.id) {
-  //     tasks.splice(index, 1, {
-  //       ...item,
-  //       userId: null
-  //     });
-  //   }
-  // });
+  return Task.updateMany(
+    {
+      userId: user._id
+    },
+    {
+      userId: null
+    }
+  );
 }
 
 module.exports = {

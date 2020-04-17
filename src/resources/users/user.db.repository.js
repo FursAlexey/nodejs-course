@@ -1,4 +1,5 @@
 const User = require('./user.model');
+const taskService = require('../tasks/task.service');
 
 /**
  * @returns {Promise<[]>}
@@ -36,8 +37,9 @@ function updateUser(user, newData) {
  * @param {object<User>} user
  * @returns {Promise<void>}
  */
-function deleteUser(user) {
-  User.findOneAndDelete(user);
+async function deleteUser(user) {
+  await taskService.unassignUserTasks(user);
+  return User.deleteOne(user);
 }
 
 module.exports = {
