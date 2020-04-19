@@ -24,16 +24,11 @@ const boardSchema = mongoose.Schema(
   }
 );
 
-boardSchema.statics.toResponse = ({ _id: id, title, columns }) => {
-  const cols = columns.map(column => ({
-    id: column._id,
-    title: column.title,
-    order: column.order
-  }));
+boardSchema.statics.toResponse = ({ _id: id, title, columns } = {}) => {
   return {
     id,
     title,
-    columns: cols
+    columns
   };
 };
 

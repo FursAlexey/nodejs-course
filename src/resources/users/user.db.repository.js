@@ -26,11 +26,11 @@ function getUserById(id) {
 
 /**
  * @param {object<User>} user
- * @param {object} newData
+ * @param {object} userUpdateData
  * @returns {Promise<void>}
  */
-function updateUser(user, newData) {
-  return User.updateOne(user, newData);
+function updateUser(user, userUpdateData) {
+  return User.updateOne(user, userUpdateData);
 }
 
 /**

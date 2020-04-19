@@ -1,6 +1,6 @@
 const Task = require('./task.model');
 
-function getAllBoardTask(boardId) {
+function getAllBoardTasksById(boardId) {
   return Task.find({
     boardId
   });
@@ -55,7 +55,7 @@ function unassignUserTasks(user) {
 }
 
 module.exports = {
-  getAllBoardTask,
+  getAllBoardTasksById,
   createTask,
   getTaskById,
   updateTask,

@@ -25,6 +25,7 @@ router.param(
   tryCatch(async (req, res, next, id) => {
     req.board = await boardsService.getBoardById(id);
     req.boardId = id;
+    if (req.board === null) await Promise.reject('Not found');
     next();
   })
 );
@@ -41,8 +42,8 @@ router
     tryCatch(async (req, res) => {
       const newBoardData = req.body;
       const { board } = req;
-      const updatedBoard = await boardsService.updateBoard(board, newBoardData);
-      res.status(200).json(Board.toResponse(updatedBoard));
+      await boardsService.updateBoard(board, newBoardData);
+      res.status(200).json('The board has been updated');
     })
   )
   .delete(

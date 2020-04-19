@@ -8,24 +8,26 @@ router
   .get(
     tryCatch(async (req, res) => {
       const { boardId } = req;
-      const boardTasks = await tasksService.getAllBoardTask(boardId);
+      const boardTasks = await tasksService.getAllBoardTasksById(boardId);
       res.status(200).json(boardTasks.map(task => Task.toResponse(task)));
     })
   )
-  .post(async (req, res) => {
-    const newTaskData = {
-      ...req.body,
-      boardId: req.boardId
-    };
-    const createdTask = await tasksService.createTask(newTaskData);
-    console.log(Task.toResponse(createdTask));
-    res.status(200).json(Task.toResponse(createdTask));
-  });
+  .post(
+    tryCatch(async (req, res) => {
+      const newTaskData = {
+        ...req.body,
+        boardId: req.boardId
+      };
+      const createdTask = await tasksService.createTask(newTaskData);
+      res.status(200).json(Task.toResponse(createdTask));
+    })
+  );
 
 router.param(
   'id',
   tryCatch(async (req, res, next, id) => {
     req.task = await tasksService.getTaskById(id);
+    if (req.task === null) await Promise.reject('Not found');
     next();
   })
 );
@@ -46,10 +48,12 @@ router
       return res.status(200).json(Task.toResponse(updatedTask));
     })
   )
-  .delete(async (req, res) => {
-    const { task } = req;
-    await tasksService.deleteTask(task);
-    res.status(200).json('The task deleted successfully');
-  });
+  .delete(
+    tryCatch(async (req, res) => {
+      const { task } = req;
+      await tasksService.deleteTask(task);
+      res.status(200).json('The task deleted successfully');
+    })
+  );
 
 module.exports = router;

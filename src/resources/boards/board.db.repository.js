@@ -1,4 +1,5 @@
 const Board = require('./board.model');
+const { getAllBoardTasksById, deleteTask } = require('../tasks/task.service');
 
 /**
  * @returns {Promise<[]>}
@@ -11,7 +12,7 @@ function getAll() {
  * @param {object<Board>} board
  * @returns {Promise<Board>}
  */
-async function createBoard(board) {
+function createBoard(board) {
   return Board.create(board);
 }
 
@@ -19,8 +20,8 @@ async function createBoard(board) {
  * @param {string} id
  * @returns {Promise<Promise<*>|*>}
  */
-async function getBoardById(id) {
-  return await Board.findById(id);
+function getBoardById(id) {
+  return Board.findById(id);
 }
 
 /**
@@ -28,8 +29,8 @@ async function getBoardById(id) {
  * @param {object} newBoardData
  * @returns {Promise<void>}
  */
-async function updateBoard(board, newBoardData) {
-  return Board.findOneAndUpdate({ _id: board._id }, newBoardData);
+function updateBoard(board, newBoardData) {
+  return Board.updateOne(board, newBoardData);
 }
 
 /**
@@ -37,7 +38,11 @@ async function updateBoard(board, newBoardData) {
  * @returns {Promise<void>}
  */
 async function deleteBoard(board) {
-  await Board.deleteOne(board);
+  const boardTasks = await getAllBoardTasksById(board._id);
+  for (const task of boardTasks) {
+    await deleteTask(task);
+  }
+  return Board.deleteOne(board);
 }
 
 module.exports = {
