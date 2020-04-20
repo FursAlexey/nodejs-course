@@ -1,18 +1,18 @@
 const User = require('./user.model');
+const taskService = require('../tasks/task.service');
 
 /**
  * @returns {Promise<[]>}
  */
-async function getAll() {
-  const users = await User.find({});
-  return users.map(user => User.toResponse(user));
+function getAll() {
+  return User.find({});
 }
 
 /**
  * @param {object<User>} user
  * @returns {Promise<User>}
  */
-async function createUser(user) {
+function createUser(user) {
   return User.create(user);
 }
 
@@ -20,17 +20,17 @@ async function createUser(user) {
  * @param {string} id
  * @returns {Promise<Promise<*>|*>}
  */
-async function getUserById(id) {
+function getUserById(id) {
   return User.findById(id);
 }
 
 /**
  * @param {object<User>} user
- * @param {object} newData
+ * @param {object} userUpdateData
  * @returns {Promise<void>}
  */
-async function updateUser(user, newData) {
-  return User.updateOne(user, newData);
+function updateUser(user, userUpdateData) {
+  return User.updateOne(user, userUpdateData);
 }
 
 /**
@@ -38,7 +38,8 @@ async function updateUser(user, newData) {
  * @returns {Promise<void>}
  */
 async function deleteUser(user) {
-  User.findOneAndDelete(user);
+  await taskService.unassignUserTasks(user);
+  return User.deleteOne(user);
 }
 
 module.exports = {
