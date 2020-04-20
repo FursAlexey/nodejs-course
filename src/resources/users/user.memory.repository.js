@@ -1,12 +1,11 @@
-const users = [];
-const userModel = require('./user.model');
-const tasksService = require('../tasks/task.service');
+const User = require('./user.model');
 
 /**
  * @returns {Promise<[]>}
  */
 async function getAll() {
-  return users;
+  const users = await User.find({});
+  return users.map(user => User.toResponse(user));
 }
 
 /**
@@ -14,9 +13,7 @@ async function getAll() {
  * @returns {Promise<User>}
  */
 async function createUser(user) {
-  const newUser = new userModel(user);
-  users.push(newUser);
-  return newUser;
+  return User.create(user);
 }
 
 /**
@@ -24,7 +21,7 @@ async function createUser(user) {
  * @returns {Promise<Promise<*>|*>}
  */
 async function getUserById(id) {
-  return users.find(item => item.id === id);
+  return User.findById(id);
 }
 
 /**
@@ -33,14 +30,7 @@ async function getUserById(id) {
  * @returns {Promise<void>}
  */
 async function updateUser(user, newData) {
-  users.map((item, index) => {
-    if (item.id === user.id) {
-      users.splice(index, 1, {
-        ...user,
-        ...newData
-      });
-    }
-  });
+  return User.updateOne(user, newData);
 }
 
 /**
@@ -48,12 +38,7 @@ async function updateUser(user, newData) {
  * @returns {Promise<void>}
  */
 async function deleteUser(user) {
-  await tasksService.unassignUserTasks(user);
-  users.map((item, index) => {
-    if (item.id === user.id) {
-      users.splice(index, 1);
-    }
-  });
+  User.findOneAndDelete(user);
 }
 
 module.exports = {
