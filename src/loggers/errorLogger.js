@@ -3,7 +3,6 @@ const fs = require('fs');
 const path = require('path');
 
 function errorLogger(error) {
-  console.log('error', __dirname);
   const errorLogFile = path.join(__dirname, '../../logs/error.log');
   const logMessage = {
     time: moment().format('YY.MM.DD_HH:mm'),
