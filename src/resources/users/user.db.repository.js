@@ -1,4 +1,4 @@
-const { hash, compare } = require('bcrypt');
+const { hash } = require('bcrypt');
 
 const User = require('./user.model');
 const taskService = require('../tasks/task.service');
@@ -31,15 +31,9 @@ function getUserById(id) {
 
 /**
  * @param {string} login
- * @param {string} password
  */
-async function getUserByLoginPassword(login, password) {
-  const user = await User.findOne({ login });
-  if (user) {
-    const passwordIsRight = await compare(password, user.password);
-    if (passwordIsRight) return user;
-  }
-  return null;
+function getUserByLogin(login) {
+  return User.findOne({ login });
 }
 
 /**
@@ -64,7 +58,7 @@ module.exports = {
   getAll,
   createUser,
   getUserById,
-  getUserByLoginPassword,
+  getUserByLogin,
   deleteUser,
   updateUser
 };

@@ -4,7 +4,8 @@ const path = require('path');
 const YAML = require('yamljs');
 const userRouter = require('./resources/users/user.router');
 const boardRouter = require('./resources/boards/board.router');
-const loginRouter = require('./resources/login/login');
+const loginRouter = require('./resources/authorization/login');
+const userIsAuth = require('./resources/authorization/userIsAuth');
 const httpRequestLogger = require('./loggers/httpRequestLogger');
 
 const app = express();
@@ -32,8 +33,8 @@ app.use('/', (req, res, next) => {
   next();
 });
 
-app.use('/users', userRouter);
-app.use('/boards', boardRouter);
+app.use('/users', userIsAuth, userRouter);
+app.use('/boards', userIsAuth, boardRouter);
 app.use('/login', loginRouter);
 
 app.use((req, res) => {
