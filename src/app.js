@@ -4,6 +4,7 @@ const path = require('path');
 const YAML = require('yamljs');
 const userRouter = require('./resources/users/user.router');
 const boardRouter = require('./resources/boards/board.router');
+const loginRouter = require('./resources/login/login');
 const httpRequestLogger = require('./loggers/httpRequestLogger');
 
 const app = express();
@@ -33,6 +34,7 @@ app.use('/', (req, res, next) => {
 
 app.use('/users', userRouter);
 app.use('/boards', boardRouter);
+app.use('/login', loginRouter);
 
 app.use((req, res) => {
   res.status(500).json('Internal Server Error');
