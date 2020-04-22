@@ -1,3 +1,5 @@
+const { hash } = require('bcrypt');
+
 const User = require('./user.model');
 const taskService = require('../tasks/task.service');
 
@@ -12,8 +14,11 @@ function getAll() {
  * @param {object<User>} user
  * @returns {Promise<User>}
  */
-function createUser(user) {
-  return User.create(user);
+async function createUser(user) {
+  return User.create({
+    ...user,
+    password: await hash(user.password, 5)
+  });
 }
 
 /**
